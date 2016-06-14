@@ -61,20 +61,15 @@ function get_mapdata()
         dropletErrorHandler::set_error_message('unexpected value "action"');
         return false;
     }
-    // create a blank image
-    $image = imagecreatetruecolor(600, 600);
     
-    // fill the background color
-    $bg = imagecolorallocate($image, 0, 0, 0);
-    imagecolortransparent($image, $bg);
-    $col_ellipse = imagecolorallocate($image, 100, 255, 150);
-
     $type = ($type == 'click' ? 0 : 1);
     $sql = "SELECT `data` FROM `wp_click_map`
     WHERE `width` = '".esc_sql($width)."' AND `type` = '".esc_sql($type)."'";
    
     $results =  $wpdb->get_results($sql,ARRAY_A);
     $xy = array();
+    $width = 0;
+    $height = 0;
     foreach($results as $result) {
         $rs = json_decode('['.$result['data'].']');
         foreach($rs as $r) {
@@ -88,9 +83,26 @@ function get_mapdata()
             }else{
                 $xy[$r->y] = 1;
             }
-            imagefilledellipse($image, $r->x, $r->y, $xy[$r->x], $xy[$r->y], $col_ellipse);
+            if($r->x > $width)$width = $r->x;
+            if($r->y > $height)$height = $r->y;
         }       
+    }
+    // create a blank image
+    $image = imagecreatetruecolor($width, $height);
+    // fill the background color
+    $bg = imagecolorallocate($image, 0, 0, 0);
+    imagecolortransparent($image, $bg);
+    $col_ellipse = imagecolorallocate($image, 100, 255, 150);
+    foreach($results as $result) {
+        $rs = json_decode('['.$result['data'].']');
+        foreach($rs as $r) {
+            imagefilledellipse($image, $r->x, $r->y, $xy[$r->x], $xy[$r->x], $col_ellipse);
+        }
     }
     header("Content-type: image/png");
     imagepng($image);
+
+
+
+    die();
 }

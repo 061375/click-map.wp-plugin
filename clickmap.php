@@ -1,10 +1,10 @@
 <?php
     /*
-    Plugin Name: Clickmap 
+    Plugin Name: Desire Map 
     Plugin URI:
     Description: 
     Version: 1.0.0.0
-    Author: Geographics
+    Author: Jeremy Heminger
     License: GPL2
     */
     
@@ -29,3 +29,17 @@
              KEY `width` (`width`,`height`)
           ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
     $wpdb->query($sql);
+    
+    add_shortcode( 'record_desire_map', 'record_desire_map' );
+    function record_desire_map()
+    {
+        wp_enqueue_style('desire_map',plugins_url('_/css/style.css',__FILE__));
+        wp_enqueue_script('desire_map',plugins_url('_/js/script.php?action=record',__FILE__));
+    }
+    add_shortcode( 'display_desire_map', 'display_desire_map' );
+    function display_desire_map( $atts )
+    {
+        wp_enqueue_style('desire_map',plugins_url('_/css/style.css',__FILE__));
+        wp_enqueue_script('desire_map',plugins_url('_/js/script.php?action='.$atts['action'],__FILE__));
+    }
+    
